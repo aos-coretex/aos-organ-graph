@@ -26,6 +26,9 @@ const PARAM_NAMES = {
   insertTransaction:    ['fields'],
   getStats:             [],
   healthCheck:          [],
+  // Deletes (MP-4)
+  deleteConcept:        ['urn'],
+  deleteBinding:        ['ubn'],
   // Stubs (Graphheight 411 / 614)
   recordRuling:         ['ruling'],
   checkSpent:           ['tokenUrn'],
@@ -222,6 +225,20 @@ export class TelemetryAdapter extends StorageAdapter {
   insertTransaction(fields) {
     return this._wrapCall('insertTransaction', [fields],
       () => this._inner.insertTransaction(fields));
+  }
+
+  // ================================================================
+  // Delete operations (MP-4)
+  // ================================================================
+
+  deleteConcept(urn) {
+    return this._wrapCall('deleteConcept', [urn],
+      () => this._inner.deleteConcept(urn));
+  }
+
+  deleteBinding(ubn) {
+    return this._wrapCall('deleteBinding', [ubn],
+      () => this._inner.deleteBinding(ubn));
   }
 
   // ================================================================

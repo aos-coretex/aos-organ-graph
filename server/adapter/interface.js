@@ -82,6 +82,18 @@ export class StorageAdapter {
     throw new Error('StorageAdapter.close() not implemented');
   }
 
+  // --- Delete operations (MP-4: Spine dual-interface) ---
+
+  /** Delete a concept by URN. Returns { urn, status: "deleted" } or null if not found. */
+  deleteConcept(_urn) {
+    throw new Error('StorageAdapter.deleteConcept() not implemented');
+  }
+
+  /** Delete a binding by UBN. Returns { ubn, status: "deleted" } or null if not found. */
+  deleteBinding(_ubn) {
+    throw new Error('StorageAdapter.deleteBinding() not implemented');
+  }
+
   // --- Blockchain operations (Graphheight 411 — stubbed until operational) ---
 
   /** Record an append-only ruling. Returns { urn, status: "recorded" }. */

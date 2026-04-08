@@ -16,6 +16,7 @@
     "verify": "node scripts/verify-migration.js"
   },
   "dependencies": {
+    "@coretex/organ-boot": "file:../../organ-shared-lib",
     "better-sqlite3": "^11.0.0",
     "express": "^5.2.1"
   }

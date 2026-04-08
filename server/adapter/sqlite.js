@@ -94,6 +94,11 @@ export class SQLiteStorageAdapter extends StorageAdapter {
       'SELECT urn FROM v_entities WHERE entity = ?'
     );
 
+    // --- Deletes (MP-4) ---
+
+    this._deleteConceptStmt = db.prepare('DELETE FROM concepts WHERE urn = ?');
+    this._deleteBindingStmt = db.prepare('DELETE FROM class_bindings WHERE ubn = ?');
+
     // --- Health ---
 
     this._healthPing = db.prepare('SELECT 1');
@@ -266,6 +271,20 @@ export class SQLiteStorageAdapter extends StorageAdapter {
     insertTx();
 
     return { urn, timestamp, binding: ubn, status: 'created' };
+  }
+
+  // ================================================================
+  // Deletes (MP-4)
+  // ================================================================
+
+  deleteConcept(urn) {
+    const result = this._deleteConceptStmt.run(urn);
+    return result.changes > 0 ? { urn, status: 'deleted' } : null;
+  }
+
+  deleteBinding(ubn) {
+    const result = this._deleteBindingStmt.run(ubn);
+    return result.changes > 0 ? { ubn, status: 'deleted' } : null;
   }
 
   // ================================================================
