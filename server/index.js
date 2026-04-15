@@ -20,6 +20,7 @@ import { statsRoutes } from './routes/stats.js';
 import { telemetryRoutes } from './routes/telemetry.js';
 import { adapterRoutes } from './routes/adapter.js';
 import { handleDirectedMessage } from './handlers/messages.js';
+import { createToolHandler } from './tool-handler.js';
 
 function log(event, data = {}) {
   const entry = { timestamp: new Date().toISOString(), event, ...data };
@@ -68,6 +69,12 @@ const organ = await createOrgan({
   },
 
   onMessage: (envelope) => handleDirectedMessage(envelope, adapter),
+
+  toolCallHandler: createToolHandler(adapter, {
+    healthCheck: async () => ({
+      db_connected: adapter.healthCheck() ? 'ok' : 'down',
+    }),
+  }),
 
   dependencies: [],
 
