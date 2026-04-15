@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://coretex.dev/schemas/graph/concept.schema.json",
+  "title": "GraphConceptInsert",
+  "description": "Body schema for POST /concepts. Ratifies the post-a7u-5 contract: type lives inside data, never at envelope. Envelope-level `type` is hard-rejected (additionalProperties: false at envelope) to prevent the drift class that produced the a7u-5 bug cluster.",
+  "type": "object",
+  "required": ["urn", "data"],
+  "additionalProperties": false,
+  "properties": {
+    "urn": {
+      "type": "string",
+      "pattern": "^urn:[a-zA-Z0-9._-]+:[a-zA-Z0-9_]+:.+$",
+      "description": "Concept URN. Format: urn:<namespace>:<type>:<identifier>"
+    },
+    "data": {
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": true,
+      "properties": {
+        "type": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "description": "Concept type (snake_case). The SQLite adapter requires this field; it is the canonical location for concept type."
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}

@@ -18,6 +18,7 @@ import { entityRoutes } from './routes/entities.js';
 import { transactionRoutes } from './routes/transactions.js';
 import { statsRoutes } from './routes/stats.js';
 import { telemetryRoutes } from './routes/telemetry.js';
+import { adapterRoutes } from './routes/adapter.js';
 import { handleDirectedMessage } from './handlers/messages.js';
 
 function log(event, data = {}) {
@@ -62,6 +63,7 @@ const organ = await createOrgan({
     app.use('/transactions', transactionRoutes(adapter));
     app.use('/stats', statsRoutes(adapter, config));
     app.use('/telemetry', telemetryRoutes(db));
+    app.use('/adapter', adapterRoutes(adapter));
     // Note: /health and /introspect now provided by organ-boot
   },
 

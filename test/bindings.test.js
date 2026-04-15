@@ -54,52 +54,65 @@ describe('Binding routes', () => {
 
   it('POST /bindings — creates a binding', async () => {
     const res = await request(app, 'POST', '/bindings', {
-      ubn: 'ubn:test:bind:100',
-      data: '{"from_urn":"urn:a","to_urn":"urn:b","relation":"depends_on"}',
+      ubn: 'ubn:test:depends_on:100',
+      data: { from_urn: 'urn:test:a:1', to_urn: 'urn:test:b:1', relation: 'depends_on' },
     });
     assert.equal(res.status, 201);
-    assert.equal(res.body.ubn, 'ubn:test:bind:100');
+    assert.equal(res.body.ubn, 'ubn:test:depends_on:100');
     assert.equal(res.body.relation, 'depends_on');
-    assert.equal(res.body.from, 'urn:a');
-    assert.equal(res.body.to, 'urn:b');
+    assert.equal(res.body.from, 'urn:test:a:1');
+    assert.equal(res.body.to, 'urn:test:b:1');
     assert.equal(res.body.status, 'created');
   });
 
   it('POST /bindings — 400 on missing required fields', async () => {
     const res = await request(app, 'POST', '/bindings', {
-      ubn: 'ubn:test:bind:bad',
-      data: '{"from_urn":"urn:a"}',
+      ubn: 'ubn:test:depends_on:bad',
+      data: { from_urn: 'urn:test:a:1' },
     });
     assert.equal(res.status, 400);
+    assert.equal(res.body.error, 'SCHEMA_VALIDATION_FAILED');
   });
 
   it('POST /bindings — 400 on missing ubn', async () => {
     const res = await request(app, 'POST', '/bindings', {
-      data: '{"from_urn":"urn:a","to_urn":"urn:b","relation":"test"}',
+      data: { from_urn: 'urn:test:a:1', to_urn: 'urn:test:b:1', relation: 'test' },
     });
     assert.equal(res.status, 400);
+    assert.equal(res.body.error, 'SCHEMA_VALIDATION_FAILED');
   });
 
   it('POST /bindings — 409 on duplicate UBN', async () => {
     const res = await request(app, 'POST', '/bindings', {
-      ubn: 'ubn:test:bind:100',
-      data: '{"from_urn":"urn:c","to_urn":"urn:d","relation":"test"}',
+      ubn: 'ubn:test:depends_on:100',
+      data: { from_urn: 'urn:test:c:1', to_urn: 'urn:test:d:1', relation: 'test' },
     });
     assert.equal(res.status, 409);
   });
 
   it('GET /bindings/:ubn — retrieves a binding', async () => {
-    const encoded = encodeURIComponent('ubn:test:bind:100');
+    const encoded = encodeURIComponent('ubn:test:depends_on:100');
     const res = await request(app, 'GET', `/bindings/${encoded}`);
     assert.equal(res.status, 200);
-    assert.equal(res.body.ubn, 'ubn:test:bind:100');
+    assert.equal(res.body.ubn, 'ubn:test:depends_on:100');
     assert.equal(res.body.data.relation, 'depends_on');
     assert.ok(res.body.created_at);
   });
 
   it('GET /bindings/:ubn — 404 on missing', async () => {
-    const encoded = encodeURIComponent('ubn:nonexistent:1');
+    const encoded = encodeURIComponent('ubn:test:nonexistent:1');
     const res = await request(app, 'GET', `/bindings/${encoded}`);
     assert.equal(res.status, 404);
+  });
+
+  it('POST /bindings — 400 hard-rejects envelope-level source_urn / target_urn (analog of a7u-5 drift)', async () => {
+    const res = await request(app, 'POST', '/bindings', {
+      ubn: 'ubn:test:depends_on:envelope-drift',
+      source_urn: 'urn:test:a:1',
+      target_urn: 'urn:test:b:1',
+      data: { from_urn: 'urn:test:a:1', to_urn: 'urn:test:b:1', relation: 'depends_on' },
+    });
+    assert.equal(res.status, 400);
+    assert.equal(res.body.error, 'SCHEMA_VALIDATION_FAILED');
   });
 });

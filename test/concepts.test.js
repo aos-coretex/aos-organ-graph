@@ -55,7 +55,7 @@ describe('Concept routes', () => {
   it('POST /concepts — creates a concept', async () => {
     const res = await request(app, 'POST', '/concepts', {
       urn: 'urn:test:concept:100',
-      data: '{"type":"test","name":"route-test"}',
+      data: { type: 'test', name: 'route-test' },
     });
     assert.equal(res.status, 201);
     assert.equal(res.body.urn, 'urn:test:concept:100');
@@ -65,23 +65,25 @@ describe('Concept routes', () => {
 
   it('POST /concepts — 400 on missing urn', async () => {
     const res = await request(app, 'POST', '/concepts', {
-      data: '{"type":"test"}',
+      data: { type: 'test' },
     });
     assert.equal(res.status, 400);
+    assert.equal(res.body.error, 'SCHEMA_VALIDATION_FAILED');
   });
 
   it('POST /concepts — 400 on missing type in data', async () => {
     const res = await request(app, 'POST', '/concepts', {
       urn: 'urn:test:concept:bad',
-      data: '{"name":"no-type"}',
+      data: { name: 'no-type' },
     });
     assert.equal(res.status, 400);
+    assert.equal(res.body.error, 'SCHEMA_VALIDATION_FAILED');
   });
 
   it('POST /concepts — 409 on duplicate URN', async () => {
     const res = await request(app, 'POST', '/concepts', {
       urn: 'urn:test:concept:100',
-      data: '{"type":"test"}',
+      data: { type: 'test' },
     });
     assert.equal(res.status, 409);
   });
@@ -96,7 +98,7 @@ describe('Concept routes', () => {
   });
 
   it('GET /concepts/:urn — 404 on missing', async () => {
-    const encoded = encodeURIComponent('urn:nonexistent:1');
+    const encoded = encodeURIComponent('urn:test:nonexistent:1');
     const res = await request(app, 'GET', `/concepts/${encoded}`);
     assert.equal(res.status, 404);
   });
@@ -104,7 +106,7 @@ describe('Concept routes', () => {
   it('PATCH /concepts/:urn — merges data', async () => {
     const encoded = encodeURIComponent('urn:test:concept:100');
     const res = await request(app, 'PATCH', `/concepts/${encoded}`, {
-      data: '{"status":"active"}',
+      data: { status: 'active' },
     });
     assert.equal(res.status, 200);
     assert.equal(res.body.data.status, 'active');
@@ -113,10 +115,20 @@ describe('Concept routes', () => {
   });
 
   it('PATCH /concepts/:urn — 404 on missing', async () => {
-    const encoded = encodeURIComponent('urn:nonexistent:1');
+    const encoded = encodeURIComponent('urn:test:nonexistent:1');
     const res = await request(app, 'PATCH', `/concepts/${encoded}`, {
-      data: '{"x":1}',
+      data: { x: 1 },
     });
     assert.equal(res.status, 404);
+  });
+
+  it('POST /concepts — 400 hard-rejects envelope-level type (a7u-5 drift class)', async () => {
+    const res = await request(app, 'POST', '/concepts', {
+      urn: 'urn:test:concept:envelope-type',
+      type: 'test',
+      data: { type: 'test', name: 'envelope-type-drift' },
+    });
+    assert.equal(res.status, 400);
+    assert.equal(res.body.error, 'SCHEMA_VALIDATION_FAILED');
   });
 });

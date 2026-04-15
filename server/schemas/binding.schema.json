@@ -1,0 +1,46 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://coretex.dev/schemas/graph/binding.schema.json",
+  "title": "GraphBindingInsert",
+  "description": "Body schema for POST /bindings. Ratifies on-disk contract: from_urn / to_urn / relation live inside data (matching SQLite adapter requirements). Envelope-level `source_urn` / `target_urn` are hard-rejected to prevent the analogous drift class that produced the concept envelope bugs in a7u-5.",
+  "type": "object",
+  "required": ["ubn", "data"],
+  "additionalProperties": false,
+  "properties": {
+    "ubn": {
+      "type": "string",
+      "pattern": "^ubn:[a-zA-Z0-9._-]+:[a-zA-Z0-9_]+:.+$",
+      "description": "Binding URN. Format: ubn:<namespace>:<relation>:<identifier>"
+    },
+    "type": {
+      "type": "string",
+      "description": "Optional binding type marker (e.g., 'instance'). Current callers send 'instance'; SQLite adapter does not require it. Permitted but not enforced."
+    },
+    "data": {
+      "type": "object",
+      "required": ["from_urn", "to_urn", "relation"],
+      "additionalProperties": true,
+      "properties": {
+        "from_urn": {
+          "type": "string",
+          "pattern": "^urn:[a-zA-Z0-9._-]+:[a-zA-Z0-9_]+:.+$",
+          "description": "Source concept URN."
+        },
+        "to_urn": {
+          "type": "string",
+          "pattern": "^urn:[a-zA-Z0-9._-]+:[a-zA-Z0-9_]+:.+$",
+          "description": "Target concept URN."
+        },
+        "relation": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "description": "Relation name (snake_case)."
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}

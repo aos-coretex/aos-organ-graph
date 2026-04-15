@@ -4,15 +4,20 @@
  */
 
 import { Router } from 'express';
-import { requireJsonBody, requireFields } from '../middleware/validate.js';
+import { requireJsonBody } from '../middleware/validate.js';
+import { validateConceptBody, validateConceptPatchBody } from '../middleware/schema-validate.js';
 
 export function conceptRoutes(adapter) {
   const router = Router();
 
   // POST /concepts — insert a new concept
-  router.post('/', requireJsonBody, requireFields('urn', 'data'), (req, res) => {
+  router.post('/', requireJsonBody, validateConceptBody, (req, res) => {
     try {
-      const result = adapter.insertConcept(req.body.urn, req.body.data);
+      // Adapter contract: data is a JSON string. Stringify if object was sent.
+      const dataStr = typeof req.body.data === 'string'
+        ? req.body.data
+        : JSON.stringify(req.body.data);
+      const result = adapter.insertConcept(req.body.urn, dataStr);
       res.status(201).json(result);
     } catch (err) {
       if (err.message.includes('UNIQUE constraint') || err.message.includes('PRIMARY KEY')) {
@@ -36,10 +41,13 @@ export function conceptRoutes(adapter) {
   });
 
   // PATCH /concepts/:urn — merge new fields into existing concept
-  router.patch('/:urn', requireJsonBody, requireFields('data'), (req, res) => {
+  router.patch('/:urn', requireJsonBody, validateConceptPatchBody, (req, res) => {
     const urn = decodeURIComponent(req.params.urn);
     try {
-      const result = adapter.updateConcept(urn, req.body.data);
+      const dataStr = typeof req.body.data === 'string'
+        ? req.body.data
+        : JSON.stringify(req.body.data);
+      const result = adapter.updateConcept(urn, dataStr);
       if (!result) {
         return res.status(404).json({ error: `Concept not found: ${urn}` });
       }

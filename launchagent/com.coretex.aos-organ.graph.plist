@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.coretex.aos-organ.graph</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/opt/homebrew/bin/node</string>
+        <string>server/index.js</string>
+    </array>
+    <key>WorkingDirectory</key>
+    <string>/Library/AI/AI-AOS/AOS-organ-dev/AOS-organ-graph/AOS-organ-graph-src</string>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>NODE_ENV</key>
+        <string>development</string>
+        <key>ORGAN_TIER</key>
+        <string>aos</string>
+    </dict>
+    <key>RunAtLoad</key>
+    <false/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>StandardOutPath</key>
+    <string>/Library/AI/AI-Infra-MDvaults/MDvault-LLM-Ops/210-Log/organ-logs/graph-stdout.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Library/AI/AI-Infra-MDvaults/MDvault-LLM-Ops/210-Log/organ-logs/graph-stderr.log</string>
+</dict>
+</plist>

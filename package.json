@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@coretex/organ-boot": "file:../../organ-shared-lib",
+    "ajv": "^8.17.1",
     "better-sqlite3": "^11.0.0",
     "express": "^5.2.1"
   }

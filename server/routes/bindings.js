@@ -4,15 +4,19 @@
  */
 
 import { Router } from 'express';
-import { requireJsonBody, requireFields } from '../middleware/validate.js';
+import { requireJsonBody } from '../middleware/validate.js';
+import { validateBindingBody } from '../middleware/schema-validate.js';
 
 export function bindingRoutes(adapter) {
   const router = Router();
 
   // POST /bindings — insert a new binding
-  router.post('/', requireJsonBody, requireFields('ubn', 'data'), (req, res) => {
+  router.post('/', requireJsonBody, validateBindingBody, (req, res) => {
     try {
-      const result = adapter.insertBinding(req.body.ubn, req.body.data);
+      const dataStr = typeof req.body.data === 'string'
+        ? req.body.data
+        : JSON.stringify(req.body.data);
+      const result = adapter.insertBinding(req.body.ubn, dataStr);
       res.status(201).json(result);
     } catch (err) {
       if (err.message.includes('UNIQUE constraint') || err.message.includes('PRIMARY KEY')) {

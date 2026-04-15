@@ -1,0 +1,41 @@
+{
+  "type": "constitution",
+  "version": "0.1-scaffold",
+  "REQUIRES_HUMAN_AUTHORSHIP": true,
+  "authority": "platform-human-principal",
+  "scope": "supreme",
+  "description": "The DIO Constitution — supreme governance document that applies to ALL entities operating on the platform. No entity BoR, MSP, or statute may contradict the Constitution. Amendments require the platform human principal via a HOM decision. This concept is a SCAFFOLD: articles contain placeholder text awaiting human authorship. No article below is binding normative policy in its current state.",
+  "sections": {
+    "preamble": {
+      "status": "placeholder",
+      "content": "[Preamble — To be authored by platform human principal. Establishes the constitutional purpose, the entities the Constitution governs, and the principle of constitutional supremacy.]"
+    },
+    "supreme_principles": {
+      "status": "placeholder",
+      "content": [
+        "[Principle 1 — To be authored]",
+        "[Principle 2 — To be authored]",
+        "[Principle 3 — To be authored]"
+      ]
+    },
+    "entity_obligations": {
+      "status": "placeholder",
+      "content": "[Entity obligations — Constraints that every enterprise entity must satisfy regardless of its own BoR/MSP. To be authored.]"
+    },
+    "vivan_obligations": {
+      "status": "placeholder",
+      "content": "[Vivan obligations — Base protections and constraints that apply to every Vivan persona regardless of role/domain/category statutes. To be authored.]"
+    },
+    "amendment_process": {
+      "status": "placeholder",
+      "content": "[Amendment process — Procedure for constitutional amendment by the platform human principal via Senate. To be authored.]"
+    },
+    "interpretation_rules": {
+      "status": "placeholder",
+      "content": "[Interpretation rules — How Arbiter, Nomos, and Senate resolve ambiguity when applying the Constitution. To be authored.]"
+    }
+  },
+  "seeded_by": "MP-17 relay g7c-1",
+  "seeded_at_iso": "__SEEDED_AT__",
+  "schema_notes": "Concept type is 'constitution'. Future amendment/version records will use type 'constitution_version' (analogous to existing 'bor_version' convention). Per MP-17 RFI-1 reply, pre-MP-17 'bor_version' concepts are left intact as a frozen historical vocabulary."
+}
