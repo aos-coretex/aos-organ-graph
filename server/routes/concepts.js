@@ -41,7 +41,14 @@ export function conceptRoutes(adapter) {
   });
 
   // PATCH /concepts/:urn — merge new fields into existing concept
+  // c2a-http-route-03: return the MP-TOOL-1 R7 tool_call_response payload shape
+  // so MCP-Router's _callHttp (which wraps the response body as `result`) yields
+  // {result:{status:"SUCCESS",data,tool,elapsed_ms,meta}} — the conformance-scan
+  // classifier reads result.status and expects a value from the closed enum.
+  // Pre-fix the adapter-native shape was {urn,data,status:"updated"} which
+  // collided with the classifier's result.status probe.
   router.patch('/:urn', requireJsonBody, validateConceptPatchBody, (req, res) => {
+    const startTime = Date.now();
     const urn = decodeURIComponent(req.params.urn);
     try {
       const dataStr = typeof req.body.data === 'string'
@@ -51,7 +58,16 @@ export function conceptRoutes(adapter) {
       if (!result) {
         return res.status(404).json({ error: `Concept not found: ${urn}` });
       }
-      res.json(result);
+      res.json({
+        status: 'SUCCESS',
+        data: {
+          urn: result.urn,
+          data: result.data,
+        },
+        tool: 'graph__update_concept',
+        elapsed_ms: Date.now() - startTime,
+        meta: { transport: 'http', organ: 'graph' },
+      });
     } catch (err) {
       res.status(500).json({ error: err.message });
     }

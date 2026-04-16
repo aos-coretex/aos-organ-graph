@@ -68,13 +68,19 @@ describe('Transaction routes', () => {
     state: 'original',
   };
 
-  it('POST /transactions — creates transaction + binding', async () => {
+  it('POST /transactions — creates transaction + binding (R7 payload shape)', async () => {
     const res = await request(app, 'POST', '/transactions', validTx);
     assert.equal(res.status, 201);
-    assert.ok(res.body.urn.startsWith('urn:llm-ops:doc_transaction:'));
-    assert.ok(res.body.binding.startsWith('ubn:llm-ops:filed_in:'));
-    assert.ok(res.body.timestamp);
-    assert.equal(res.body.status, 'created');
+    // R7 envelope (c2a-http-route-03)
+    assert.equal(res.body.status, 'SUCCESS');
+    assert.equal(res.body.tool, 'graph__insert_transaction');
+    assert.equal(res.body.meta.transport, 'http');
+    assert.equal(res.body.meta.organ, 'graph');
+    assert.ok(typeof res.body.elapsed_ms === 'number');
+    // Payload
+    assert.ok(res.body.data.urn.startsWith('urn:llm-ops:doc_transaction:'));
+    assert.ok(res.body.data.binding.startsWith('ubn:llm-ops:filed_in:'));
+    assert.ok(res.body.data.timestamp);
   });
 
   it('POST /transactions — verifies concept and binding in DB', async () => {
@@ -85,16 +91,16 @@ describe('Transaction routes', () => {
     assert.equal(res.status, 201);
 
     // Verify concept was created
-    const concept = adapter.getConcept(res.body.urn);
+    const concept = adapter.getConcept(res.body.data.urn);
     assert.ok(concept);
     assert.equal(concept.data.type, 'doc_transaction');
     assert.equal(concept.data.operation, 'INGEST');
 
     // Verify binding was created
-    const binding = adapter.getBinding(res.body.binding);
+    const binding = adapter.getBinding(res.body.data.binding);
     assert.ok(binding);
     assert.equal(binding.data.relation, 'filed_in');
-    assert.equal(binding.data.from_urn, res.body.urn);
+    assert.equal(binding.data.from_urn, res.body.data.urn);
   });
 
   it('POST /transactions — 400 on nonexistent entity', async () => {
@@ -124,7 +130,7 @@ describe('Transaction routes', () => {
     });
     assert.equal(res.status, 201);
 
-    const concept = adapter.getConcept(res.body.urn);
+    const concept = adapter.getConcept(res.body.data.urn);
     assert.equal(concept.data.department, 'engineering');
     assert.equal(concept.data.source, 'manual');
     assert.equal(concept.data.rationale, 'test optional fields');

@@ -103,15 +103,22 @@ describe('Concept routes', () => {
     assert.equal(res.status, 404);
   });
 
-  it('PATCH /concepts/:urn — merges data', async () => {
+  it('PATCH /concepts/:urn — merges data (R7 payload shape)', async () => {
     const encoded = encodeURIComponent('urn:test:concept:100');
     const res = await request(app, 'PATCH', `/concepts/${encoded}`, {
       data: { status: 'active' },
     });
     assert.equal(res.status, 200);
-    assert.equal(res.body.data.status, 'active');
-    assert.equal(res.body.data.name, 'route-test');
-    assert.equal(res.body.status, 'updated');
+    // R7 envelope (c2a-http-route-03)
+    assert.equal(res.body.status, 'SUCCESS');
+    assert.equal(res.body.tool, 'graph__update_concept');
+    assert.equal(res.body.meta.transport, 'http');
+    assert.equal(res.body.meta.organ, 'graph');
+    assert.ok(typeof res.body.elapsed_ms === 'number');
+    // Payload — merged concept
+    assert.equal(res.body.data.urn, 'urn:test:concept:100');
+    assert.equal(res.body.data.data.status, 'active');
+    assert.equal(res.body.data.data.name, 'route-test');
   });
 
   it('PATCH /concepts/:urn — 404 on missing', async () => {
